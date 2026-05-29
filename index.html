@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laberinto Inclusivo</title>
+  <title>Nivel 1 - Dia nevado</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,11 +11,11 @@
   <div id="aria-live" aria-live="polite" class="sr-only"></div>
 
   <header>
-    <h1>Laberinto Inclusivo</h1>
+    <h1>Nivel 1 - Dia nevado</h1>
   </header>
 
-  <main>
-    <section class="game-info">
+  <main id="main-game">
+    <section class="game-info" id="game-info">
       <div class="coins-panel">
         <span>Monedas: <span id="coins-count">0</span> / <span id="coins-total">2</span></span>
       </div>
@@ -24,29 +24,37 @@
       </div>
     </section>
 
-    <!-- Contenedor del Laberinto -->
-    <section id="game-board" class="game-board" aria-label="Tablero del laberinto">
-      <!-- Generado dinámicamente -->
-    </section>
-
-    <!-- Controles en pantalla -->
-    <section class="controls-panel" aria-label="Controles de movimiento">
-      <div class="d-pad">
-        <button id="btn-up" class="control-btn" aria-label="Mover Arriba">↑</button>
-        <div class="d-pad-middle">
-          <button id="btn-left" class="control-btn" aria-label="Mover Izquierda">←</button>
-          <div class="d-pad-center"></div>
-          <button id="btn-right" class="control-btn" aria-label="Mover Derecha">→</button>
+    <div class="game-area" id="game-area">
+      <!-- Contenedor del Laberinto y el Overlay -->
+      <div class="board-wrapper">
+        <section id="game-board" class="game-board" aria-label="Tablero del laberinto">
+          <!-- Generado dinámicamente -->
+        </section>
+        <div id="exit-open-overlay" class="hidden" aria-hidden="true">
+          ¡Encuentra la salida!
         </div>
-        <button id="btn-down" class="control-btn" aria-label="Mover Abajo">↓</button>
       </div>
-    </section>
 
-    <!-- Mensaje de Victoria -->
-    <div id="victory-message" class="hidden">
-      <h2>¡Encuentra la salida!</h2>
-      <p>Has completado el Nivel 1.</p>
+      <!-- Controles en pantalla -->
+      <section class="controls-panel" aria-label="Controles de movimiento">
+        <div class="d-pad">
+          <button id="btn-up" class="control-btn" aria-label="Mover Arriba">↑</button>
+          <div class="d-pad-middle">
+            <button id="btn-left" class="control-btn" aria-label="Mover Izquierda">←</button>
+            <div class="d-pad-center"></div>
+            <button id="btn-right" class="control-btn" aria-label="Mover Derecha">→</button>
+          </div>
+          <button id="btn-down" class="control-btn" aria-label="Mover Abajo">↓</button>
+        </div>
+      </section>
     </div>
+
+    <!-- Vista de Nivel Completado -->
+    <section id="level-complete-view" class="hidden">
+      <h2>Nivel 1 completado</h2>
+      <p>Presiona "Continuar" o cualquier tecla para avanzar.</p>
+      <button id="btn-continue" class="control-btn btn-large">Continuar</button>
+    </section>
   </main>
 
   <script src="script.js"></script>

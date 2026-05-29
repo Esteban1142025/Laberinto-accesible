@@ -10,14 +10,17 @@ const TILE_DOOR_RED = 6;
 // Configuración de niveles (Escalable)
 const niveles = [
   {
-    // Nivel 1: Tutorial
+    // Nivel 1: Dia nevado
     matriz: [
-      [1, 1, 1, 1, 1, 1, 1],
-      [1, 2, 0, 3, 1, 4, 1],
-      [1, 1, 1, 0, 1, 6, 1],
-      [1, 5, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 3, 1],
-      [1, 1, 1, 1, 1, 1, 1]
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 2, 0, 1, 0, 0, 0, 0, 3, 1],
+      [1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 1, 5, 0, 0, 1],
+      [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 3, 1, 0, 0, 0, 1],
+      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 0, 6, 4, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ],
     totalMonedas: 2
   }
@@ -43,7 +46,7 @@ const ariaLiveEl = document.getElementById('aria-live');
 const coinsCountEl = document.getElementById('coins-count');
 const coinsTotalEl = document.getElementById('coins-total');
 const inventoryListEl = document.getElementById('inventory-list');
-const victoryMessageEl = document.getElementById('victory-message');
+const exitOverlayEl = document.getElementById('exit-open-overlay');
 
 function initJuego() {
   cargarNivel(nivelActualIndex);
@@ -60,7 +63,7 @@ function cargarNivel(index) {
   juegoTerminado = false;
 
   actualizarUIStatus();
-  victoryMessageEl.classList.add('hidden');
+  exitOverlayEl.classList.add('hidden');
   
   // Encontrar posición inicial del jugador
   for (let y = 0; y < mapa.length; y++) {
@@ -82,8 +85,8 @@ function renderizarMapa() {
   const filas = mapa.length;
   const columnas = mapa[0].length;
   
-  boardEl.style.gridTemplateColumns = `repeat(${columnas}, 1fr)`;
-  boardEl.style.gridTemplateRows = `repeat(${filas}, 1fr)`;
+  boardEl.style.gridTemplateColumns = `repeat(${columnas}, 35px)`;
+  boardEl.style.gridTemplateRows = `repeat(${filas}, 35px)`;
 
   for (let y = 0; y < filas; y++) {
     for (let x = 0; x < columnas; x++) {
@@ -91,7 +94,6 @@ function renderizarMapa() {
       const tipo = mapa[y][x];
       
       let claseCell = 'cell ';
-      let contenido = '';
 
       // Si es la posición del jugador
       if (jugador.x === x && jugador.y === y) {
@@ -100,23 +102,20 @@ function renderizarMapa() {
         switch (tipo) {
           case TILE_PATH: claseCell += 'path'; break;
           case TILE_WALL: claseCell += 'wall'; break;
-          case TILE_COIN: claseCell += 'coin'; contenido = '🟡'; break;
-          case TILE_KEY_RED: claseCell += 'key'; contenido = '🔑'; break;
-          case TILE_DOOR_RED: claseCell += 'door'; contenido = '🚪'; break;
+          case TILE_COIN: claseCell += 'coin'; break;
+          case TILE_KEY_RED: claseCell += 'key'; break;
+          case TILE_DOOR_RED: claseCell += 'door'; break;
           case TILE_EXIT: 
             if (monedasRecolectadas >= totalMonedasNivel) {
               claseCell += 'exit-open';
-              contenido = '🏁';
             } else {
               claseCell += 'exit-closed';
-              contenido = '🔒';
             }
             break;
         }
       }
 
       cellEl.className = claseCell;
-      cellEl.textContent = contenido;
       boardEl.appendChild(cellEl);
     }
   }
@@ -127,7 +126,7 @@ function actualizarUIStatus() {
   coinsTotalEl.textContent = totalMonedasNivel;
   
   if (inventario.llaveRoja) {
-    inventoryListEl.textContent = 'Llave Roja 🔑';
+    inventoryListEl.textContent = 'Llave Roja';
   } else {
     inventoryListEl.textContent = 'Vacío';
   }
@@ -187,7 +186,19 @@ function moverJugador(dx, dy) {
   if (destino === TILE_COIN) {
     monedasRecolectadas++;
     mapa[ny][nx] = TILE_PATH;
-    mensaje = `Moneda recogida. Tienes ${monedasRecolectadas} de ${totalMonedasNivel}.`;
+    if (monedasRecolectadas >= totalMonedasNivel) {
+      mensaje = "Todas las monedas recogidas. ¡Encuentra la salida!";
+      exitOverlayEl.classList.remove('hidden');
+      setTimeout(() => {
+        exitOverlayEl.classList.add('fade-out');
+        setTimeout(() => {
+          exitOverlayEl.classList.add('hidden');
+          exitOverlayEl.classList.remove('fade-out');
+        }, 300);
+      }, 2500);
+    } else {
+      mensaje = `Moneda recogida. Tienes ${monedasRecolectadas} de ${totalMonedasNivel}.`;
+    }
     actualizarUIStatus();
   } else if (destino === TILE_KEY_RED) {
     inventario.llaveRoja = true;
@@ -202,8 +213,22 @@ function moverJugador(dx, dy) {
 
 function victoria() {
   juegoTerminado = true;
-  anunciar("¡Encuentra la salida! Has ganado el Nivel 1.");
-  victoryMessageEl.classList.remove('hidden');
+  anunciar("¡Nivel 1 completado! Has ganado.");
+  
+  document.getElementById('game-info').classList.add('hidden');
+  document.getElementById('game-area').classList.add('hidden');
+  document.getElementById('level-complete-view').classList.remove('hidden');
+}
+
+function avanzarNivel() {
+  if (!juegoTerminado) return;
+  alert("¡Próximamente más niveles! Reiniciando el Nivel 1 por ahora.");
+  
+  document.getElementById('game-info').classList.remove('hidden');
+  document.getElementById('game-area').classList.remove('hidden');
+  document.getElementById('level-complete-view').classList.add('hidden');
+  
+  cargarNivel(nivelActualIndex);
 }
 
 function anunciar(mensaje) {
@@ -217,6 +242,14 @@ function anunciar(mensaje) {
 function configurarControles() {
   // Teclado físico
   document.addEventListener('keydown', (e) => {
+    if (juegoTerminado) {
+      avanzarNivel();
+      return;
+    }
+
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      e.preventDefault(); // Evita que la página haga scroll
+    }
     switch(e.key) {
       case 'ArrowUp': moverJugador(0, -1); break;
       case 'ArrowDown': moverJugador(0, 1); break;
@@ -230,6 +263,8 @@ function configurarControles() {
   document.getElementById('btn-down').addEventListener('click', () => moverJugador(0, 1));
   document.getElementById('btn-left').addEventListener('click', () => moverJugador(-1, 0));
   document.getElementById('btn-right').addEventListener('click', () => moverJugador(1, 0));
+  // Botón continuar
+  document.getElementById('btn-continue').addEventListener('click', avanzarNivel);
 }
 
 // Iniciar juego al cargar
