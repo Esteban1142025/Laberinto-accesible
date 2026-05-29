@@ -1,0 +1,153 @@
+/* Variables de Alto Contraste */
+:root {
+  --bg-color: #121212;
+  --text-color: #ffffff;
+  --wall-color: #333333;
+  --path-color: #eeeeee;
+  --player-color: #4facfe;
+  --key-color: #ff3366;
+  --door-color: #ff3366;
+  --coin-color: #ffd700;
+  --exit-closed-color: #555555;
+  --exit-open-color: #00ff00;
+  --btn-bg: #222222;
+  --btn-border: #ffffff;
+  --btn-hover: #444444;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+header {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.game-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Tablero de Juego */
+.game-board {
+  display: grid;
+  gap: 2px;
+  background-color: var(--wall-color);
+  border: 4px solid var(--wall-color);
+  margin-bottom: 1.5rem;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.cell.path { background-color: var(--path-color); }
+.cell.wall { background-color: var(--wall-color); }
+.cell.player { background-color: var(--path-color); position: relative; }
+.cell.player::after {
+  content: '';
+  width: 80%;
+  height: 80%;
+  background-color: var(--player-color);
+  border-radius: 50%;
+}
+.cell.key { background-color: var(--path-color); color: var(--key-color); }
+.cell.door { background-color: var(--door-color); }
+.cell.coin { background-color: var(--path-color); color: var(--coin-color); font-weight: bold; }
+.cell.exit-closed { background-color: var(--exit-closed-color); }
+.cell.exit-open { background-color: var(--exit-open-color); }
+
+/* Controles */
+.controls-panel {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.d-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.d-pad-middle {
+  display: flex;
+  gap: 5px;
+}
+
+.d-pad-center {
+  width: 50px;
+  height: 50px;
+}
+
+/* Áreas clickables mínimas de 44x44px (a11y) */
+.control-btn {
+  min-width: 50px;
+  min-height: 50px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  border: 2px solid var(--btn-border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+
+.control-btn:hover, .control-btn:focus {
+  background-color: var(--btn-hover);
+  outline: 3px solid var(--player-color);
+}
+
+.control-btn:active {
+  transform: scale(0.95);
+}
+
+/* Mensaje de Victoria */
+.hidden {
+  display: none !important;
+}
+
+#victory-message {
+  text-align: center;
+  background-color: var(--player-color);
+  color: var(--bg-color);
+  padding: 2rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+}
