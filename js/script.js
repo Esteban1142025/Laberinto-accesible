@@ -9,11 +9,18 @@ const TILE_DOOR_RED = 6;
 
 const TILE_KEY_BLUE = 7;
 const TILE_DOOR_BLUE = 8;
+const TILE_SWITCH = 9;
+const TILE_SPIKE_A = 10;
+const TILE_SPIKE_B = 11;
 
 // Configuración de niveles (Escalable)
 const niveles = [
   {
-    // Nivel 1: Dia nevado extendido
+    titulo: "Nivel 1",
+    subtitulo: "Día Nevado",
+    bgClass: "bg-snow",
+    bgMusic1: "assets/nivel1/Nivel1_OST.mp3",
+    bgMusic2: null,
     matriz: [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       [1, 2, 0, 0, 1, 0, 7, 0, 1, 0, 0, 0, 0, 0, 1],
@@ -32,8 +39,38 @@ const niveles = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ],
     totalMonedas: 2
+  },
+  {
+    titulo: "Nivel 2",
+    subtitulo: "Atardecer en la Jungla",
+    bgClass: "bg-jungle",
+    bgMusic1: "assets/nivel2/Nivel2_OST.mp3",
+    bgMusic2: "assets/nivel2/Nivel2.2_OST.mp3",
+    matriz: [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 2, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 9, 1, 3, 1],
+      [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 1, 0, 1, 7, 0, 0, 0, 3, 1, 0, 1, 0, 0, 0, 1, 0, 1],
+      [1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 1, 0, 0, 0, 1, 10,1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+      [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+      [1, 6, 1, 0, 1, 0, 0, 0, 1, 11,1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+      [1, 4, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+      [1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1],
+      [1, 0, 0, 0, 1, 0, 0, 3, 1, 5, 1, 3, 0, 0, 1, 3, 1, 0, 0, 3, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ],
+    totalMonedas: 6
   }
-  // Aquí se pueden añadir más niveles en el futuro
 ];
 
 // Estado del juego
@@ -44,6 +81,7 @@ let inventario = { llaveRoja: false, llaveAzul: false };
 let monedasRecolectadas = 0;
 let totalMonedasNivel = 0;
 let juegoTerminado = false;
+let estadoInterruptor = false;
 
 // Cooldown para evitar doble pulsación (Accesibilidad motora)
 let enCooldown = false;
@@ -111,6 +149,23 @@ function cargarNivel(index) {
   inventario.llaveRoja = false;
   inventario.llaveAzul = false;
   juegoTerminado = false;
+  estadoInterruptor = false;
+
+  // UI e Info del nivel
+  document.body.className = nivel.bgClass;
+  document.querySelector('#start-screen h2').textContent = nivel.titulo;
+  document.querySelector('#start-screen p').textContent = nivel.subtitulo;
+  
+  // Actualizar también el título del juego principal (fuera del start-screen)
+  const headerTitleEl = document.getElementById('level-header-title');
+  if (headerTitleEl) {
+    headerTitleEl.textContent = `${nivel.titulo} - ${nivel.subtitulo}`;
+  }
+
+  if (bgMusic) {
+    bgMusic.src = nivel.bgMusic1;
+    bgMusic.load();
+  }
 
   actualizarUIStatus();
   exitOverlayEl.classList.add('hidden');
@@ -158,6 +213,9 @@ function renderizarMapa() {
           case TILE_DOOR_RED: claseCell += 'door'; break;
           case TILE_KEY_BLUE: claseCell += 'key-blue'; break;
           case TILE_DOOR_BLUE: claseCell += 'door-blue'; break;
+          case TILE_SWITCH: claseCell += 'switch'; break;
+          case TILE_SPIKE_A: claseCell += 'spike-a ' + (estadoInterruptor ? 'inactive' : 'active'); break;
+          case TILE_SPIKE_B: claseCell += 'spike-b ' + (estadoInterruptor ? 'active' : 'inactive'); break;
           case TILE_EXIT: 
             if (monedasRecolectadas >= totalMonedasNivel) {
               claseCell += 'exit-open';
@@ -214,6 +272,16 @@ function moverJugador(dx, dy) {
     return;
   }
 
+  if (destino === TILE_SPIKE_A && !estadoInterruptor) {
+    anunciar("Barrera de pinchos naranjas bloqueando el paso.");
+    return;
+  }
+
+  if (destino === TILE_SPIKE_B && estadoInterruptor) {
+    anunciar("Barrera de pinchos morados bloqueando el paso.");
+    return;
+  }
+
   if (destino === TILE_DOOR_RED) {
     if (inventario.llaveRoja) {
       anunciar("Has abierto la puerta roja.");
@@ -257,12 +325,24 @@ function moverJugador(dx, dy) {
   jugador.y = ny;
   let mensaje = "Movimiento.";
 
-  // Recoger objetos
-  if (destino === TILE_COIN) {
+  // Recoger o interactuar con objetos
+  if (destino === TILE_SWITCH) {
+    estadoInterruptor = !estadoInterruptor;
+    mensaje = "Interruptor activado. Las barreras han cambiado de estado.";
+    // NO reemplazamos la celda, el interruptor se queda ahí
+  } else if (destino === TILE_COIN) {
     monedasRecolectadas++;
     mapa[ny][nx] = TILE_PATH;
     if (monedasRecolectadas >= totalMonedasNivel) {
       mensaje = "Todas las monedas recogidas. ¡Encuentra la salida!";
+      
+      const nivel = niveles[nivelActualIndex];
+      if (nivel.bgMusic2 && bgMusic) {
+        bgMusic.src = nivel.bgMusic2;
+        bgMusic.load();
+        bgMusic.play().catch(e => console.log(e));
+      }
+
       exitOverlayEl.classList.remove('hidden');
       setTimeout(() => {
         exitOverlayEl.classList.add('fade-out');
@@ -325,12 +405,27 @@ function victoria() {
 
 function avanzarNivel() {
   if (!juegoTerminado) return;
-  alert("¡Próximamente más niveles! Reiniciando el Nivel 1 por ahora.");
+  
+  nivelActualIndex++;
+  if (nivelActualIndex >= niveles.length) {
+    alert("¡Felicidades! Has completado todos los niveles disponibles. Reiniciando...");
+    nivelActualIndex = 0;
+    // Volver al Menú principal al acabar el juego completo
+    document.getElementById('level-complete-view').classList.add('hidden');
+    document.getElementById('main-menu').style.opacity = '1';
+    document.getElementById('main-menu').style.visibility = 'visible';
+    return;
+  }
   
   document.getElementById('game-info').classList.remove('hidden');
   document.getElementById('game-area').classList.remove('hidden');
   document.getElementById('level-complete-view').classList.add('hidden');
   
+  // Mostrar start-screen del nuevo nivel
+  document.getElementById('start-screen').classList.remove('hidden');
+  document.getElementById('start-screen').style.opacity = '1';
+  document.getElementById('start-screen').style.visibility = 'visible';
+
   cargarNivel(nivelActualIndex);
 }
 

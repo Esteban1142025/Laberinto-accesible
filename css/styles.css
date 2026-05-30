@@ -24,11 +24,20 @@ body {
   align-items: center;
   background-color: var(--bg-color);
   color: var(--text-color);
-  background-image: linear-gradient(rgba(11, 17, 32, 0.7), rgba(11, 17, 32, 0.8)), url('../assets/nivel1/snowy_background.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   min-height: 100vh;
+  transition: background-image 0.5s ease;
+}
+
+body.bg-snow {
+  background-image: linear-gradient(rgba(11, 17, 32, 0.7), rgba(11, 17, 32, 0.8)), url('../assets/nivel1/snowy_background.png');
+}
+
+body.bg-jungle {
+  --wall-color: rgba(34, 139, 34, 0.5); /* Verde jungla para paredes y marcos */
+  background-image: linear-gradient(rgba(11, 17, 32, 0.7), rgba(11, 17, 32, 0.8)), url('../assets/nivel2/jungle_sunset_bg.png');
 }
 
 /* Menú Principal */
@@ -296,6 +305,45 @@ header {
 .cell.path { 
   background-color: var(--path-color); 
   border-radius: 4px;
+}
+
+.cell.door-blue {
+  background-color: var(--door-blue-color);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255, 255, 255, 0.2) 5px, rgba(255, 255, 255, 0.2) 10px);
+  border: 2px solid #1d4ed8;
+  border-radius: 4px;
+}
+
+/* Nivel 2: Interruptores y Pinchos */
+.cell.switch {
+  background-color: #fcd34d;
+  border-radius: 50%;
+  box-shadow: inset 0 0 10px #b45309;
+  border: 2px solid #fff;
+}
+
+.cell.spike-a {
+  background-color: #ea580c; /* Naranja */
+  transition: all 0.3s ease;
+}
+
+.cell.spike-b {
+  background-color: #9333ea; /* Morado */
+  transition: all 0.3s ease;
+}
+
+.cell.spike-a.inactive, .cell.spike-b.inactive {
+  opacity: 0.3;
+  transform: scale(0.6);
+  border-radius: 50%;
+}
+
+.cell.spike-a.active, .cell.spike-b.active {
+  opacity: 1;
+  transform: scale(1);
+  border-radius: 4px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+  border: 2px solid #fff;
 }
 
 .cell.wall { 
