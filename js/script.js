@@ -398,6 +398,12 @@ function victoria() {
     bgMusic.currentTime = 0;
   }
 
+  // Update victory title dynamically
+  const titleEl = document.getElementById('victory-title');
+  if (titleEl) {
+    titleEl.textContent = `Nivel ${nivelActualIndex + 1} completado`;
+  }
+
   document.getElementById('game-info').classList.add('hidden');
   document.getElementById('game-area').classList.add('hidden');
   document.getElementById('level-complete-view').classList.remove('hidden');
@@ -463,6 +469,14 @@ function configurarControles() {
   document.getElementById('btn-right').addEventListener('click', () => moverJugador(1, 0));
   // Botón continuar
   document.getElementById('btn-continue').addEventListener('click', avanzarNivel);
+  
+  // Botón volver al menú desde victoria
+  const btnBackVictory = document.getElementById('btn-back-menu-victory');
+  if (btnBackVictory) {
+    btnBackVictory.addEventListener('click', () => {
+      location.reload(); // Recarga la página para volver al estado inicial del menú
+    });
+  }
 }
 
 // Iniciar juego al cargar

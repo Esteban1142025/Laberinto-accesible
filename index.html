@@ -86,9 +86,12 @@
 
     <!-- Vista de Nivel Completado -->
     <section id="level-complete-view" class="hidden">
-      <h2>Nivel 1 completado</h2>
+      <h2 id="victory-title">Nivel 1 completado</h2>
       <p>Presiona "Continuar" o cualquier tecla para avanzar.</p>
-      <button id="btn-continue" class="control-btn btn-large">Continuar</button>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+        <button id="btn-continue" class="control-btn btn-large">Continuar</button>
+        <button id="btn-back-menu-victory" class="control-btn btn-large" style="background-color: var(--exit-closed-color);">Menú</button>
+      </div>
     </section>
   </main>
   
