@@ -59,6 +59,32 @@ const exitOverlayEl = document.getElementById('exit-open-overlay');
 const bgMusic = document.getElementById('bg-music');
 const startScreenEl = document.getElementById('start-screen');
 const btnStartEl = document.getElementById('btn-start');
+const mainMenuEl = document.getElementById('main-menu');
+const btnPlayEl = document.getElementById('btn-play');
+const btnInstructionsEl = document.getElementById('btn-instructions');
+const btnBackMenuEl = document.getElementById('btn-back-menu');
+const menuOptionsEl = document.getElementById('menu-options');
+const instructionsPanelEl = document.getElementById('instructions-panel');
+
+btnInstructionsEl.addEventListener('click', () => {
+  menuOptionsEl.classList.add('hidden');
+  instructionsPanelEl.classList.remove('hidden');
+});
+
+btnBackMenuEl.addEventListener('click', () => {
+  instructionsPanelEl.classList.add('hidden');
+  menuOptionsEl.classList.remove('hidden');
+});
+
+btnPlayEl.addEventListener('click', () => {
+  mainMenuEl.style.opacity = '0';
+  setTimeout(() => {
+    mainMenuEl.style.visibility = 'hidden';
+    startScreenEl.classList.remove('hidden');
+    startScreenEl.style.opacity = '1';
+    startScreenEl.style.visibility = 'visible';
+  }, 600);
+});
 
 btnStartEl.addEventListener('click', () => {
   startScreenEl.style.opacity = '0';
