@@ -79,6 +79,7 @@ const niveles = [
 let nivelActualIndex = 0;
 let mapa = [];
 let jugador = { x: 0, y: 0 };
+let posInicial = { x: 0, y: 0 };
 let inventario = { llaveRoja: false, llaveAzul: false };
 let monedasRecolectadas = 0;
 let totalMonedasNivel = 0;
@@ -180,6 +181,8 @@ function cargarNivel(index) {
       if (mapa[y][x] === TILE_PLAYER_START) {
         jugador.x = x;
         jugador.y = y;
+        posInicial.x = x;
+        posInicial.y = y;
         mapa[y][x] = TILE_PATH; // Limpiar casilla debajo del jugador
       }
     }
@@ -343,8 +346,18 @@ function moverJugador(dx, dy) {
     monedasRecolectadas++;
     mapa[ny][nx] = TILE_PATH;
     if (monedasRecolectadas >= totalMonedasNivel) {
-      mensaje = "Todas las monedas recogidas. ¡Encuentra la salida!";
+      mensaje = "Todas las monedas recogidas. ¡La salida ha cambiado de lugar!";
       
+      // Engaño: mover la salida a la posición inicial
+      for (let y = 0; y < mapa.length; y++) {
+        for (let x = 0; x < mapa[y].length; x++) {
+          if (mapa[y][x] === TILE_EXIT) {
+            mapa[y][x] = TILE_PATH;
+          }
+        }
+      }
+      mapa[posInicial.y][posInicial.x] = TILE_EXIT;
+
       const nivel = niveles[nivelActualIndex];
       if (nivel.bgMusic2 && bgMusic) {
         bgMusic.src = nivel.bgMusic2;
