@@ -7,8 +7,21 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <audio id="bg-music" loop>
+    <source src="Nivel1_OST.mp3" type="audio/mpeg">
+  </audio>
+
   <!-- Región en vivo para lectores de pantalla -->
   <div id="aria-live" aria-live="polite" class="sr-only"></div>
+
+  <!-- Pantalla de Inicio (Para desbloquear el Audio) -->
+  <div id="start-screen" class="start-screen">
+    <div class="start-content">
+      <h2>Nivel 1</h2>
+      <p>Día Nevado</p>
+      <button id="btn-start" class="btn-start">Comenzar Nivel</button>
+    </div>
+  </div>
 
   <header>
     <h1>Nivel 1 - Dia nevado</h1>
@@ -27,9 +40,11 @@
     <div class="game-area" id="game-area">
       <!-- Contenedor del Laberinto y el Overlay -->
       <div class="board-wrapper">
-        <section id="game-board" class="game-board" aria-label="Tablero del laberinto">
-          <!-- Generado dinámicamente -->
-        </section>
+        <div id="maze-viewport" class="maze-viewport">
+          <section id="game-board" class="game-board" aria-label="Tablero del laberinto">
+            <!-- Generado dinámicamente -->
+          </section>
+        </div>
         <div id="exit-open-overlay" class="hidden" aria-hidden="true">
           ¡Encuentra la salida!
         </div>

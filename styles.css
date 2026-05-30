@@ -31,6 +31,60 @@ body {
   min-height: 100vh;
 }
 
+/* Pantalla de Inicio (Audio Unlock) */
+.start-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(11, 17, 32, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease-out, visibility 0.5s;
+}
+
+.start-content {
+  background: rgba(30, 41, 59, 0.9);
+  padding: 3rem 4rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.start-content h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  color: var(--player-color);
+}
+
+.start-content p {
+  margin: 0 0 2rem 0;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.btn-start {
+  background-color: var(--exit-open-color);
+  color: #fff;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-start:hover {
+  background-color: #059669;
+  transform: scale(1.05);
+}
+
 /* Solo para lectores de pantalla */
 .sr-only {
   position: absolute;
@@ -52,6 +106,8 @@ header {
 .game-info {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
   width: 100%;
   max-width: 400px;
   margin-bottom: 0.5rem;
@@ -76,6 +132,19 @@ header {
 /* Wrapper para posicionar el overlay sobre el laberinto */
 .board-wrapper {
   position: relative;
+}
+
+.maze-viewport {
+  width: 339px; /* 9x35px + gaps */
+  height: 339px;
+  overflow: hidden;
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 6px solid var(--wall-color);
+  border-radius: 8px;
+  padding: 2px;
+  backdrop-filter: blur(4px);
+  box-sizing: content-box;
 }
 
 #exit-open-overlay {
@@ -113,12 +182,10 @@ header {
 .game-board {
   display: grid;
   gap: 3px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 6px solid var(--wall-color);
-  border-radius: 8px;
-  margin-bottom: 0;
-  padding: 2px;
-  backdrop-filter: blur(4px); /* Suaviza el fondo que se asoma */
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease-out; /* Animación suave de cámara */
 }
 
 .cell {
@@ -162,7 +229,18 @@ header {
   transform: rotate(45deg);
 }
 
+.cell.key-blue { background-color: var(--path-color); position: relative; }
+.cell.key-blue::after {
+  content: '';
+  position: absolute;
+  width: 40%;
+  height: 40%;
+  background-color: #3b82f6; /* Color azul */
+  transform: rotate(45deg);
+}
+
 .cell.door { background-color: var(--door-color); }
+.cell.door-blue { background-color: #3b82f6; }
 
 .cell.coin { background-color: var(--path-color); position: relative; }
 .cell.coin::after {

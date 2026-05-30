@@ -7,20 +7,29 @@ const TILE_EXIT = 4;
 const TILE_KEY_RED = 5;
 const TILE_DOOR_RED = 6;
 
+const TILE_KEY_BLUE = 7;
+const TILE_DOOR_BLUE = 8;
+
 // Configuración de niveles (Escalable)
 const niveles = [
   {
-    // Nivel 1: Dia nevado
+    // Nivel 1: Dia nevado extendido
     matriz: [
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 2, 0, 1, 0, 0, 0, 0, 3, 1],
-      [1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 0, 1, 5, 0, 0, 1],
-      [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-      [1, 0, 0, 0, 3, 1, 0, 0, 0, 1],
-      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1],
-      [1, 0, 0, 0, 0, 0, 0, 6, 4, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 2, 0, 0, 1, 0, 7, 0, 1, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+      [1, 0, 0, 0, 1, 3, 0, 0, 0, 5, 1, 0, 0, 0, 1],
+      [1, 1, 1, 0, 1, 1, 1, 8, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+      [1, 0, 1, 3, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+      [1, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ],
     totalMonedas: 2
   }
@@ -31,7 +40,7 @@ const niveles = [
 let nivelActualIndex = 0;
 let mapa = [];
 let jugador = { x: 0, y: 0 };
-let inventario = { llaveRoja: false };
+let inventario = { llaveRoja: false, llaveAzul: false };
 let monedasRecolectadas = 0;
 let totalMonedasNivel = 0;
 let juegoTerminado = false;
@@ -47,6 +56,20 @@ const coinsCountEl = document.getElementById('coins-count');
 const coinsTotalEl = document.getElementById('coins-total');
 const inventoryListEl = document.getElementById('inventory-list');
 const exitOverlayEl = document.getElementById('exit-open-overlay');
+const bgMusic = document.getElementById('bg-music');
+const startScreenEl = document.getElementById('start-screen');
+const btnStartEl = document.getElementById('btn-start');
+
+btnStartEl.addEventListener('click', () => {
+  startScreenEl.style.opacity = '0';
+  setTimeout(() => {
+    startScreenEl.style.visibility = 'hidden';
+  }, 500);
+  
+  if (bgMusic) {
+    bgMusic.play().catch(e => console.log("Audio autoplay prevented", e));
+  }
+});
 
 function initJuego() {
   cargarNivel(nivelActualIndex);
@@ -60,6 +83,7 @@ function cargarNivel(index) {
   totalMonedasNivel = nivel.totalMonedas;
   monedasRecolectadas = 0;
   inventario.llaveRoja = false;
+  inventario.llaveAzul = false;
   juegoTerminado = false;
 
   actualizarUIStatus();
@@ -77,6 +101,7 @@ function cargarNivel(index) {
   }
 
   renderizarMapa();
+  actualizarCamara();
   anunciar("Nivel cargado. Encuentra las llaves y monedas para llegar a la salida.");
 }
 
@@ -105,6 +130,8 @@ function renderizarMapa() {
           case TILE_COIN: claseCell += 'coin'; break;
           case TILE_KEY_RED: claseCell += 'key'; break;
           case TILE_DOOR_RED: claseCell += 'door'; break;
+          case TILE_KEY_BLUE: claseCell += 'key-blue'; break;
+          case TILE_DOOR_BLUE: claseCell += 'door-blue'; break;
           case TILE_EXIT: 
             if (monedasRecolectadas >= totalMonedasNivel) {
               claseCell += 'exit-open';
@@ -125,8 +152,12 @@ function actualizarUIStatus() {
   coinsCountEl.textContent = monedasRecolectadas;
   coinsTotalEl.textContent = totalMonedasNivel;
   
-  if (inventario.llaveRoja) {
-    inventoryListEl.textContent = 'Llave Roja';
+  let llaves = [];
+  if (inventario.llaveRoja) llaves.push('Roja');
+  if (inventario.llaveAzul) llaves.push('Azul');
+  
+  if (llaves.length > 0) {
+    inventoryListEl.textContent = `Llaves: ${llaves.join(', ')}`;
   } else {
     inventoryListEl.textContent = 'Vacío';
   }
@@ -134,6 +165,10 @@ function actualizarUIStatus() {
 
 function moverJugador(dx, dy) {
   if (juegoTerminado || enCooldown) return;
+
+  if (bgMusic && bgMusic.paused) {
+    bgMusic.play().catch(e => console.log("Audio autoplay prevented", e));
+  }
 
   // Aplicar cooldown (debounce) para accesibilidad motora
   enCooldown = true;
@@ -159,6 +194,16 @@ function moverJugador(dx, dy) {
       mapa[ny][nx] = TILE_PATH; // Abrir puerta
     } else {
       anunciar("Puerta roja bloqueada. Necesitas la llave roja.");
+      return;
+    }
+  }
+
+  if (destino === TILE_DOOR_BLUE) {
+    if (inventario.llaveAzul) {
+      anunciar("Has abierto la puerta azul.");
+      mapa[ny][nx] = TILE_PATH; // Abrir puerta
+    } else {
+      anunciar("Puerta azul bloqueada. Necesitas la llave azul.");
       return;
     }
   }
@@ -205,16 +250,44 @@ function moverJugador(dx, dy) {
     mapa[ny][nx] = TILE_PATH;
     mensaje = "Llave roja recogida. Revisa tu inventario.";
     actualizarUIStatus();
+  } else if (destino === TILE_KEY_BLUE) {
+    inventario.llaveAzul = true;
+    mapa[ny][nx] = TILE_PATH;
+    mensaje = "Llave azul recogida. Revisa tu inventario.";
+    actualizarUIStatus();
   }
 
   anunciar(mensaje);
   renderizarMapa();
+  actualizarCamara();
+}
+
+function actualizarCamara() {
+  const cellTotalSize = 38;
+  const viewportCells = 9;
+  const halfViewport = Math.floor(viewportCells / 2);
+
+  const maxCamX = mapa[0].length - viewportCells;
+  const maxCamY = mapa.length - viewportCells;
+
+  let camX = jugador.x - halfViewport;
+  let camY = jugador.y - halfViewport;
+
+  camX = Math.max(0, Math.min(camX, maxCamX));
+  camY = Math.max(0, Math.min(camY, maxCamY));
+
+  boardEl.style.transform = `translate(-${camX * cellTotalSize}px, -${camY * cellTotalSize}px)`;
 }
 
 function victoria() {
   juegoTerminado = true;
-  anunciar("¡Nivel 1 completado! Has ganado.");
+  anunciar("¡Felicidades! Has encontrado la salida y completado el nivel.");
   
+  if (bgMusic) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  }
+
   document.getElementById('game-info').classList.add('hidden');
   document.getElementById('game-area').classList.add('hidden');
   document.getElementById('level-complete-view').classList.remove('hidden');
