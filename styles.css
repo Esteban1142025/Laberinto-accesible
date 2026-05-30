@@ -105,20 +105,26 @@ header {
 
 .game-info {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 1rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   margin-bottom: 0.5rem;
-  font-size: 1.2rem;
-  font-weight: bold;
+}
+
+.info-box {
   background-color: rgba(11, 17, 32, 0.6);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(4px);
+  font-size: 1.2rem;
+  font-weight: bold;
+  flex: auto;
+  text-align: center;
+  white-space: nowrap;
 }
 
 /* Area de Juego (Contiene tablero y controles) */

@@ -27,8 +27,8 @@ const niveles = [
       [1, 0, 1, 3, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
       [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1],
       [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
-      [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
-      [1, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 6, 1, 1, 1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 1, 1, 1, 4, 1, 1, 1, 0, 0, 0, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ],
     totalMonedas: 2
@@ -153,13 +153,13 @@ function actualizarUIStatus() {
   coinsTotalEl.textContent = totalMonedasNivel;
   
   let llaves = [];
-  if (inventario.llaveRoja) llaves.push('Roja');
-  if (inventario.llaveAzul) llaves.push('Azul');
+  if (inventario.llaveRoja) llaves.push("Roja");
+  if (inventario.llaveAzul) llaves.push("Azul");
   
-  if (llaves.length > 0) {
-    inventoryListEl.textContent = `Llaves: ${llaves.join(', ')}`;
+  if (llaves.length === 0) {
+    inventoryListEl.textContent = "Vacío";
   } else {
-    inventoryListEl.textContent = 'Vacío';
+    inventoryListEl.textContent = llaves.join(", ");
   }
 }
 
@@ -191,7 +191,9 @@ function moverJugador(dx, dy) {
   if (destino === TILE_DOOR_RED) {
     if (inventario.llaveRoja) {
       anunciar("Has abierto la puerta roja.");
+      inventario.llaveRoja = false;
       mapa[ny][nx] = TILE_PATH; // Abrir puerta
+      actualizarUIStatus();
     } else {
       anunciar("Puerta roja bloqueada. Necesitas la llave roja.");
       return;
@@ -201,7 +203,9 @@ function moverJugador(dx, dy) {
   if (destino === TILE_DOOR_BLUE) {
     if (inventario.llaveAzul) {
       anunciar("Has abierto la puerta azul.");
+      inventario.llaveAzul = false;
       mapa[ny][nx] = TILE_PATH; // Abrir puerta
+      actualizarUIStatus();
     } else {
       anunciar("Puerta azul bloqueada. Necesitas la llave azul.");
       return;
