@@ -12,6 +12,8 @@ const TILE_DOOR_BLUE = 8;
 const TILE_SWITCH = 9;
 const TILE_SPIKE_A = 10;
 const TILE_SPIKE_B = 11;
+const TILE_SWITCH_RED = 12;
+const TILE_SPIKE_RED = 13;
 
 // Configuración de niveles (Escalable)
 const niveles = [
@@ -60,11 +62,11 @@ const niveles = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
-      [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+      [1, 13,1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
       [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1],
-      [1, 6, 1, 0, 1, 0, 0, 0, 1, 11,1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+      [1, 6, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
       [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
-      [1, 4, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+      [1, 4, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 12,0, 0, 1],
       [1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1],
       [1, 0, 0, 0, 1, 0, 0, 3, 1, 5, 1, 3, 0, 0, 1, 3, 1, 0, 0, 3, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -82,6 +84,7 @@ let monedasRecolectadas = 0;
 let totalMonedasNivel = 0;
 let juegoTerminado = false;
 let estadoInterruptor = false;
+let estadoInterruptorRojo = false;
 
 // Cooldown para evitar doble pulsación (Accesibilidad motora)
 let enCooldown = false;
@@ -150,6 +153,7 @@ function cargarNivel(index) {
   inventario.llaveAzul = false;
   juegoTerminado = false;
   estadoInterruptor = false;
+  estadoInterruptorRojo = false;
 
   // UI e Info del nivel
   document.body.className = nivel.bgClass;
@@ -214,8 +218,10 @@ function renderizarMapa() {
           case TILE_KEY_BLUE: claseCell += 'key-blue'; break;
           case TILE_DOOR_BLUE: claseCell += 'door-blue'; break;
           case TILE_SWITCH: claseCell += 'switch'; break;
+          case TILE_SWITCH_RED: claseCell += 'switch-red'; break;
           case TILE_SPIKE_A: claseCell += 'spike-a ' + (estadoInterruptor ? 'inactive' : 'active'); break;
           case TILE_SPIKE_B: claseCell += 'spike-b ' + (estadoInterruptor ? 'active' : 'inactive'); break;
+          case TILE_SPIKE_RED: claseCell += 'spike-red ' + (estadoInterruptorRojo ? 'inactive' : 'active'); break;
           case TILE_EXIT: 
             if (monedasRecolectadas >= totalMonedasNivel) {
               claseCell += 'exit-open';
@@ -267,18 +273,15 @@ function moverJugador(dx, dy) {
   const destino = mapa[ny][nx];
 
   // Lógica de colisiones e interacción
-  if (destino === TILE_WALL) {
-    anunciar("Pared. No puedes avanzar.");
-    return;
-  }
-
-  if (destino === TILE_SPIKE_A && !estadoInterruptor) {
-    anunciar("Barrera de pinchos naranjas bloqueando el paso.");
-    return;
-  }
-
-  if (destino === TILE_SPIKE_B && estadoInterruptor) {
-    anunciar("Barrera de pinchos morados bloqueando el paso.");
+  if (destino === TILE_WALL || 
+      (destino === TILE_EXIT && monedasRecolectadas < totalMonedasNivel) ||
+      (destino === TILE_DOOR_RED && !inventario.llaveRoja) ||
+      (destino === TILE_DOOR_BLUE && !inventario.llaveAzul) ||
+      (destino === TILE_SPIKE_A && !estadoInterruptor) ||
+      (destino === TILE_SPIKE_B && estadoInterruptor) ||
+      (destino === TILE_SPIKE_RED && !estadoInterruptorRojo)
+     ) {
+    anunciar("Camino bloqueado.");
     return;
   }
 
@@ -328,8 +331,14 @@ function moverJugador(dx, dy) {
   // Recoger o interactuar con objetos
   if (destino === TILE_SWITCH) {
     estadoInterruptor = !estadoInterruptor;
-    mensaje = "Interruptor activado. Las barreras han cambiado de estado.";
-    // NO reemplazamos la celda, el interruptor se queda ahí
+    mensaje = estadoInterruptor ? "Interruptor activado. Se bajaron algunos pinchos." : "Interruptor desactivado. El estado del laberinto cambió.";
+  } else if (destino === TILE_SWITCH_RED) {
+    if (!estadoInterruptorRojo) {
+      estadoInterruptorRojo = true;
+      mensaje = "Interruptor rojo activado. Pinchos rojos bajados.";
+    } else {
+      mensaje = "Los pinchos rojos ya están bajados.";
+    }
   } else if (destino === TILE_COIN) {
     monedasRecolectadas++;
     mapa[ny][nx] = TILE_PATH;
